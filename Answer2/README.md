@@ -21,6 +21,11 @@
 
     - Application Testing:
         - Perform application-level tests to ensure that the application interacts with the cloud database as expected and returns correct data.
+     
+5. AWS (Amazon Web Services)
+    - AWS DMS (Database Migration Service) can be used for data migration and supports validation tasks. It includes data validation capabilities that compare the source and target data.
+
+    - DMS Validation Report provides detailed insights into the consistency of the data after migration.
 
 ### Example Checkpoints for List<Map<String,String>> Data: 
 
@@ -32,3 +37,9 @@
 
 3. Checksum/Hash Verification:
     - Calculate a hash for each map in the list and compare corresponding hashes between local and cloud databases.
+  
+4. Data Sampling
+    - Randomly select a sample of records and compare them between the original and copied databases.
+  
+5. Data validation script
+    - Write a validation script which compares data row by row of both databases.
