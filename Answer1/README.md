@@ -1,35 +1,36 @@
 # 1.a What did the system do?
 
 ## File management service 
-File Management Service is designed to offload server workload by leveraging AWS S3 and CloudFront. Here's how it works:
+File Management Service is designed to offload server workload by leveraging AWS S3 and CloudFront. Here's how it works :
 
-	1. Direct Uploads to S3: To reduce server load, we use pre-signed URLs, allowing clients to upload files directly to S3 buckets. This method grants temporary access to the bucket, enabling uploads without server intervention.
+1. Direct Uploads to S3: To reduce server load, we use pre-signed URLs, allowing clients to upload files directly to S3 buckets. This method grants temporary access to the bucket, enabling uploads without server intervention.
 
-	2.Optimized File Access: For file retrieval, we provide CloudFront URLs. CloudFront caches files in its CDN network, reducing latency and improving download speeds, especially when the origin server is located in a different geographic region.
+2. Optimized File Access: For file retrieval, we provide CloudFront URLs. CloudFront caches files in its CDN network, reducing latency and improving download speeds, especially when the origin server is located in a different geographic region.
 
-	3. Multipart Uploads: Our service supports multipart uploads. This feature is crucial for large files, ensuring that if an upload is interrupted, it can resume from where it left off, enhancing reliability and efficiency.
+3. Multipart Uploads: Our service supports multipart uploads. This feature is crucial for large files, ensuring that if an upload is interrupted, it can resume from where it left off, enhancing reliability and efficiency.
 	
-	4.Media File Transcoding: We incorporate media file transcoding, converting video files into the m3u8 format. This process compresses video files and improves streaming performance for multiple clients.
+4. Media File Transcoding: We incorporate media file transcoding, converting video files into the m3u8 format. This process compresses video files and improves streaming performance for multiple clients.
 
-	5.When a client uploads a media file, an AWS Lambda function is triggered to detect the file type and initiate transcoding. During the transcoding process, the original file format is served to the client. To minimize polling, AWS SNS is used to notify the service once the transcoding is complete. A consumer in the service updates the status, allowing the service to then serve the optimized m3u8 file format.
+5. When a client uploads a media file, an AWS Lambda function is triggered to detect the file type and initiate transcoding. During the transcoding process, the original file format is served to the client. To minimize polling, AWS SNS is used to notify the service once the transcoding is complete. A consumer in the service updates the status, allowing the service to then serve the optimized m3u8 file format.
 
 ## User Management Service
-User management service is a centralized microservice designed to manage Docquity users' data efficiently and securely. Here’s an overview of its key features and benefits:
+User management service is a centralized microservice designed to manage Docquity users' data efficiently and securely. Here’s an overview of its key features and benefits :
 
-	1. Centralized User Data Management: Previously, each module at Docquity maintained its own user data, leading to inconsistencies when the same user registered across multiple modules. Our centralized service consolidates all user data in one place, eliminating data ambiguity and ensuring consistency.
+1. Centralized User Data Management: Previously, each module at Docquity maintained its own user data, leading to inconsistencies when the same user registered across multiple modules. Our centralized service consolidates all user data in one place, eliminating data ambiguity and ensuring consistency.
 	
-	2. Enhanced Security with GPG Encryption: Given Docquity's role in connecting healthcare professionals with pharmacy companies, patients, and others in the healthcare market, securing personally identifiable information (PII) is paramount. We use GPG encryption to protect sensitive user data, including phone numbers, emails, medical documents, and licenses etc.
+2. Enhanced Security with GPG Encryption: Given Docquity's role in connecting healthcare professionals with pharmacy companies, patients, and others in the healthcare market, securing personally identifiable information (PII) is paramount. We use GPG encryption to protect sensitive user data, including phone numbers, emails, medical documents, and licenses etc.
 
-	3. User Consent for Data Sharing: Data is shared among multiple modules only with user consent, ensuring compliance with privacy regulations and maintaining user trust.
+3. User Consent for Data Sharing: Data is shared among multiple modules only with user consent, ensuring compliance with privacy regulations and maintaining user trust.
 
-	4.Unique Identifiers for Data Retrieval: User details can be fetched using two parameters:
-		- User Code: An internal alphanumeric string used by other services to fetch user details. This code is not exposed externally due to its simplicity and ease of generation.
+4. Unique Identifiers for Data Retrieval, user details can be fetched using two parameters :-
 
-		- UUID: Used for external access, ensuring secure and unique identification of users.
+    a. User Code -> An internal alphanumeric string used by other services to fetch user details. This code is not exposed externally due to its simplicity and ease of generation.
 
-	5. Kafka Integration for Backward Compatibility: To support previous versions and ensure seamless data integration, user data is produced in Kafka.
+    b. UUID -> Used for external access, ensuring secure and unique identification of users.
 
-	6. Scalability: We successfully migrated over 500k+ users to our service from different modules, demonstrating its capability to handle large-scale data management.
+5. Kafka Integration for Backward Compatibility: To support previous versions and ensure seamless data integration, user data is produced in Kafka.
+
+6. Scalability: We successfully migrated over 500k+ users to our service from different modules, demonstrating its capability to handle large-scale data management.
 
 # 1.b. What other systems have you seen in the wild like that?
 
@@ -124,8 +125,9 @@ Package embed provides access to files embedded in the running Go program. There
 2. Working with goroutines:
 To achieve concurrency I used goroutines in a for loop but not getting the expected output. Since its not easy to debug the code when it is running in multiple goroutines but after debugging the code thoroughly I found a bug that goroutines works differently in the loop and found on stack overflow to how to handle this. And luckily GoLang fixed this bug in there newer version.
 
-Here is an example :
+Here is an example:
 
+```
 package main
 import (
 	"fmt"
@@ -141,11 +143,13 @@ func main() {
 		}()
 	}
 	wg.Wait()
-} 
+}
+```
 
 In the Above code snippet the output we assumed is that we got numbers printed from 0-9 randomly. Right?
 But no the output is 10 printing 10 times. This is because the for loop finishes before the goroutines schedule and execute.On the last execution when i is equal to 9 it must still follow the incremental rule i++ . Now that i is equal to 10, the conditional rule i < 10 results to false which is what stops the loop from executing the body further.And in Golang, the iterative variable is shared to the body as a pointer. So by passing variable i in the function the issue will be resolved. Below is the code snippet - 
 
+```
 var wg = &sync.WaitGroup{}
 for i := 0; i < 10; i++ {
 	wg.Add(1)
@@ -155,4 +159,5 @@ for i := 0; i < 10; i++ {
 	}(i)
 }
 wg.Wait()
+```
 Now the output will be printing 0-9 values randomly.
