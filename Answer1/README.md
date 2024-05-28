@@ -2,6 +2,7 @@
 
 ## File management service 
 File Management Service is designed to offload server workload by leveraging AWS S3 and CloudFront. Here's how it works:
+
 	1. Direct Uploads to S3: To reduce server load, we use pre-signed URLs, allowing clients to upload files directly to S3 buckets. This method grants temporary access to the bucket, enabling uploads without server intervention.
 
 	2.Optimized File Access: For file retrieval, we provide CloudFront URLs. CloudFront caches files in its CDN network, reducing latency and improving download speeds, especially when the origin server is located in a different geographic region.
